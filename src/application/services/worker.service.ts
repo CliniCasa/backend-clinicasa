@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Worker } from '../../domain/entities/worker.entity';
 import { CreateWorkerDto } from '../../application/dto/create-worker.dto';
 import { UpdateWorkerDto } from '../../application/dto/update-worker.dto';
+import { WorkerRole } from 'src/domain/enums/workerRole.enums';
 
 @Injectable()
 export class WorkerService {
@@ -27,6 +28,16 @@ export class WorkerService {
       throw new NotFoundException(`Worker with ID "${id}" not found`);
     }
     return worker;
+  }
+
+  async findByRole(role: WorkerRole): Promise<Worker[]> {
+    const workers = await this.workerRepository.find({
+      where: { role },
+    });
+    if (!workers || workers.length === 0) {
+      throw new NotFoundException(`Nenhum worker encontrado com o cargo: ${role}`);
+    }
+    return workers;
   }
 
   async update(id: string, updateWorkerDto: UpdateWorkerDto): Promise<Worker> {

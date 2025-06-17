@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
-import { WorkerRole } from '../../domain/entities/worker.entity';
+import { WorkerRole  } from '../../domain/enums/workerRole.enums'; 
 import { ApiProperty } from '@nestjs/swagger'; 
 
 export class CreateWorkerDto {

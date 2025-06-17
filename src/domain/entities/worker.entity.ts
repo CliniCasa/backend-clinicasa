@@ -1,13 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'; // 1. Importação do Swagger
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-
-export enum WorkerRole {
-  ENFERMEIRA = 'Enfermeira',
-  MASSAGISTA = 'Massagista',
-  FISIOTERAPEUTA = 'Fisioterapeuta',
-  PSICOLOGO = 'Psicólogo',
-  OUTROS = 'Outros',
-}
+import { WorkerRole } from '../enums/workerRole.enums';
 
 @Entity({ name: 'workers' })
 export class Worker {

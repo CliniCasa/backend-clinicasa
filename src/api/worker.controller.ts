@@ -9,14 +9,16 @@ import {
   ParseUUIDPipe,
   HttpCode,
   HttpStatus,
+  ParseEnumPipe,
 } from '@nestjs/common';
 import { WorkerService } from '../application/services/worker.service';
 import { CreateWorkerDto } from '../application/dto/create-worker.dto';
 import { UpdateWorkerDto } from '../application/dto/update-worker.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger'; // Importe os decoradores
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger'; 
 import { Worker } from '../domain/entities/worker.entity';
+import { WorkerRole } from '../domain/enums/workerRole.enums'; 
 
-@ApiTags('Workers') // Agrupa todos os endpoints sob a tag "Workers" na UI
+@ApiTags('Workers') 
 @Controller('workers')
 export class WorkerController {
   constructor(private readonly workerService: WorkerService) {}
@@ -43,6 +45,23 @@ export class WorkerController {
   @ApiResponse({ status: 404, description: 'Funcionário não encontrado.' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.workerService.findOne(id);
+  }
+
+  @Get('role/:role')
+  @ApiOperation({ summary: 'Obtém todos os funcionários por cargo' }) 
+  @ApiParam({ 
+    name: 'role',
+    enum: WorkerRole,
+    description: 'O cargo do funcionário (ex: ENFERMEIRA, FISIOTERAPEUTA)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de funcionários com o cargo especificado.',
+    type: [Worker], 
+  })
+  @ApiResponse({ status: 404, description: 'Nenhum funcionário encontrado para este cargo.' })
+  async findByRole(@Param('role', new ParseEnumPipe(WorkerRole)) role: WorkerRole): Promise<Worker[]> {
+    return this.workerService.findByRole(role);
   }
 
   @Patch(':id')
