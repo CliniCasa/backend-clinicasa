@@ -1,9 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Worker } from '../../domain/entities/worker.entity';
-import { CreateWorkerDto } from '../../application/dto/create-worker.dto';
-import { UpdateWorkerDto } from '../../application/dto/update-worker.dto';
+import { CreateWorkerDto } from '../dto/worker/create-worker.dto';
+import { UpdateWorkerDto } from '../dto/worker/update-worker.dto';
+import { PaginationDto } from '../dto/pagination/pagination.dto';
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  lastPage: number;
+}
 
 @Injectable()
 export class WorkerService {
@@ -17,16 +25,33 @@ export class WorkerService {
     return this.workerRepository.save(worker);
   }
 
-  findAll(): Promise<Worker[]> {
-    return this.workerRepository.find();
-  }
-
   async findOne(id: string): Promise<Worker> {
     const worker = await this.workerRepository.findOneBy({ id });
     if (!worker) {
       throw new NotFoundException(`Worker with ID "${id}" not found`);
     }
     return worker;
+  }
+
+  async findAll(query: PaginationDto): Promise<PaginatedResult<Worker>> {
+    const { page = 1, limit = 10, search } = query;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.workerRepository.findAndCount({
+      where: search ? { name: Like(`%${search}%`) } : {}, 
+      take: limit,
+      skip,
+      order: { name: 'ASC' },
+    });
+
+    const lastPage = Math.ceil(total / limit);
+    
+    return {
+      data,
+      total,
+      page,
+      lastPage,
+    };
   }
 
   async update(id: string, updateWorkerDto: UpdateWorkerDto): Promise<Worker> {
