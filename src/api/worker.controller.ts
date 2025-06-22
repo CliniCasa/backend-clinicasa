@@ -9,14 +9,17 @@ import {
   ParseUUIDPipe,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { WorkerService } from '../application/services/worker.service';
-import { CreateWorkerDto } from '../application/dto/create-worker.dto';
-import { UpdateWorkerDto } from '../application/dto/update-worker.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger'; // Importe os decoradores
+import { CreateWorkerDto } from '../application/dto/worker/create-worker.dto';
+import { UpdateWorkerDto } from '../application/dto/worker/update-worker.dto';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger'; // Importe os decoradores
 import { Worker } from '../domain/entities/worker.entity';
+import { PaginationDto } from 'src/application/dto/pagination/pagination.dto';
+import { PaginationResultDto } from 'src/application/dto/pagination/paginationResult.dto';
 
-@ApiTags('Workers') // Agrupa todos os endpoints sob a tag "Workers" na UI
+@ApiTags('Workers') 
 @Controller('workers')
 export class WorkerController {
   constructor(private readonly workerService: WorkerService) {}
@@ -30,10 +33,14 @@ export class WorkerController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar todos os funcionários' })
-  @ApiResponse({ status: 200, description: 'Lista de funcionários retornada com sucesso.', type: [Worker] })
-  findAll() {
-    return this.workerService.findAll();
+  @ApiOperation({ summary: 'Listar funcionários com paginação e busca' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Número da página' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Itens por página' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Termo de busca por nome' })
+  @ApiResponse({ status: 200, description: 'Lista de funcionários paginada.', type: PaginationResultDto }) 
+  @ApiResponse({ status: 400, description: 'Parâmetros de paginação inválidos.' })
+  findAll(@Query() paginationDto: PaginationDto) { 
+    return this.workerService.findAll(paginationDto); 
   }
 
   @Get(':id')
