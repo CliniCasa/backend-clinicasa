@@ -8,6 +8,9 @@ import { AddressModule } from './address.module';
 import { UserModule } from './user.module';
 import { AppointmentsModule } from './appointments.module';
 import { AuthModule } from './auth/auth.module';
+import { SeedService } from './seed';
+import { Worker } from './domain/entities/worker.entity';
+import { User } from './domain/entities/user.entity';
 
 @Module({
   imports: [
@@ -28,6 +31,7 @@ import { AuthModule } from './auth/auth.module';
         synchronize: false,
       }),
     }),
+    TypeOrmModule.forFeature([Worker, User]),
     WorkerModule,
     AddressModule,
     UserModule,
@@ -35,6 +39,6 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SeedService],
 })
 export class AppModule {}

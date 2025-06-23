@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { WorkerRole } from '../../../domain/enums/workerRole.enums';
 import { ApiProperty } from '@nestjs/swagger'; 
 
@@ -28,13 +28,4 @@ export class CreateWorkerDto {
   @IsEnum(WorkerRole)
   @IsNotEmpty()
   role: WorkerRole;
-
-  @ApiProperty({
-  description: 'Uma breve descrição ou biografia do funcionário',
-  example: 'Enfermeira chefe com 10 anos de experiência.',
-  required: false,
-  })
-  @IsString()
-  @IsOptional() 
-  description?: string;
-  }
+}
