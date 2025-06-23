@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../domain/entities/user.entity';
@@ -30,20 +30,27 @@ export class UserService {
     return this.userRepo.find();
   }
 
-  findOne(id: number) {
-    return this.userRepo.findOne({ where: { id } });
-  }
-
-  async update(id: number, dto: UpdateUserDto) {
-    if (dto.password) {
-      dto.password = await bcrypt.hash(dto.password, 10);
+  async findOne(id: number): Promise<User> { // Alterado de string para number
+    const user = await this.userRepo.findOneBy({ id });
+    if (!user) {
+        throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
     }
-    await this.userRepo.update(id, dto);
-    return this.findOne(id);
+    return user;
   }
 
-  async remove(id: number) {
-    await this.userRepo.delete(id);
-    return { deleted: true };
+  async update(id: number, dto: UpdateUserDto) { // Alterado de string para number
+    // Aqui também seria bom adicionar hashing de senha se a senha for alterada
+    const user = await this.userRepo.preload({ id, ...dto });
+    if (!user) {
+        throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+    }
+    return this.userRepo.save(user);
+  }
+
+  async remove(id: number): Promise<void> { // Alterado de string para number
+    const result = await this.userRepo.delete(id);
+    if (result.affected === 0) {
+        throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+    }
   }
 }

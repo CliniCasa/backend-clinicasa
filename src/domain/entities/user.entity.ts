@@ -11,7 +11,6 @@ import { Appointments } from './appointments.entity';
 
 @Entity('users')
 export class User {
-  // ID serial como identificador único (consistente com as migrações)
   @PrimaryGeneratedColumn()
   id: number;
 

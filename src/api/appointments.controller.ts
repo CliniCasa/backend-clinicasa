@@ -24,7 +24,8 @@ export class AppointmentsController {
   @ApiOperation({ summary: 'Criar um novo agendamento' })
   @ApiResponse({ status: 201, description: 'Agendamento criado com sucesso.' })
   @ApiResponse({ status: 409, description: 'Este horário já está ocupado.' }) // Conflict
+  @ApiResponse({ status: 404, description: 'Usuário ou Funcionário não encontrado.' })
   create(@Body() createAppointmentDto: CreateAppointmentDto) {
-    // return this.appointmentsService.create(createAppointmentDto);
+    return this.appointmentsService.create(createAppointmentDto);
   }
 }

@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from 'src/application/services/user.service';
 import { CreateUserDto } from 'src/application/dto/user/create-user.dto';
@@ -41,7 +42,7 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'ID do usuário (inteiro)' })
   @ApiResponse({ status: 200, description: 'Usuário encontrado.', type: User })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseIntPipe) id: number)  {
     return this.service.findOne(id);
   }
 
