@@ -1,10 +1,12 @@
 // src/appointments/appointments.service.ts
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Appointments } from '../../domain/entities/appointments.entity';
 import { Between, Repository } from 'typeorm';
 import { CreateAppointmentDto } from '../dto/appointments/create-appointment.dto';  
 import { format, startOfDay, endOfDay } from 'date-fns';
+import { User } from '../../domain/entities/user.entity';
+import { Worker } from '../../domain/entities/worker.entity';
 
 const PRE_DEFINED_SLOTS = [
   '08:00', '09:00', '10:00', '11:00',
@@ -16,12 +18,16 @@ export class AppointmentsService {
   constructor(
     @InjectRepository(Appointments)
     private readonly appointmentRepository: Repository<Appointments>,
+    // 3. Injetar os repositórios de Worker e User
+    @InjectRepository(Worker)
+    private readonly workerRepository: Repository<Worker>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async getAvailableSlots(workerId: string, date: string): Promise<string[]> {
     const requestedDate = new Date(date);
 
-    // 1. Buscar no banco todos os agendamentos para o worker no dia solicitado
     const appointments = await this.appointmentRepository.find({
       where: {
         worker: { id: workerId },
@@ -29,10 +35,8 @@ export class AppointmentsService {
       },
     });
 
-    // 2. Extrair apenas as horas dos agendamentos existentes (ex: "08:00", "14:00")
     const bookedSlots = appointments.map(app => format(app.date, 'HH:mm'));
 
-    // 3. Filtrar a lista de horários pré-definidos, removendo os que já estão agendados
     const availableSlots = PRE_DEFINED_SLOTS.filter(
       slot => !bookedSlots.includes(slot),
     );
@@ -40,31 +44,49 @@ export class AppointmentsService {
     return availableSlots;
   }
 
-//   async create(createAppointmentDto: CreateAppointmentDto): Promise<Appointments> {
-//     const { workerId, userId, date } = createAppointmentDto;
+  // --- MÉTODO CREATE ATUALIZADO ---
+  async create(createAppointmentDto: CreateAppointmentDto): Promise<Appointments> {
+    const { workerId, userId, date, service } = createAppointmentDto;
 
-//     const appointmentDate = new Date(date);
+    // 4. Buscar as entidades completas de Worker e User
+    const worker = await this.workerRepository.findOneBy({ id: workerId });
+    if (!worker) {
+      throw new NotFoundException(`Worker com ID "${workerId}" não encontrado.`);
+    }
 
-//     // CRÍTICO: Verificar se o horário já não foi agendado por outra pessoa
-//     // enquanto o usuário estava na tela.
-//     const existingAppointment = await this.appointmentRepository.findOne({
-//       where: {
-//         worker: { id: workerId },
-//         date: appointmentDate,
-//       },
-//     });
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException(`User com ID "${userId}" não encontrado.`);
+    }
+    
+    // 5. VALIDAÇÃO PRINCIPAL: Verificar se o serviço está na lista de serviços do funcionário
+    if (!worker.services.includes(service)) {
+      throw new BadRequestException(
+        `O serviço "${service}" selecionado não é realizado por este funcionário.`,
+      );
+    }
+    
+    // 6. Manter sua validação original de conflito de horário
+    const appointmentDate = new Date(date);
+    const existingAppointment = await this.appointmentRepository.findOne({
+      where: {
+        worker: { id: workerId },
+        date: appointmentDate,
+      },
+    });
 
-//     if (existingAppointment) {
-//       throw new ConflictException('Este horário não está mais disponível.');
-//     }
+    if (existingAppointment) {
+      throw new ConflictException('Este horário não está mais disponível.');
+    }
 
-//     // Se estiver livre, cria o agendamento
-//     const newAppointment = this.appointmentRepository.create({
-//       date: appointmentDate,
-//       worker: { id: workerId }, // TypeORM é inteligente o suficiente para lidar com isso
-//       user: { id: userId },
-//     });
+    // 7. Se tudo estiver correto, criar o agendamento com as entidades e o serviço
+    const newAppointment = this.appointmentRepository.create({
+      date: appointmentDate,
+      service, 
+      worker,  
+      user,    
+    });
 
-//     return this.appointmentRepository.save(newAppointment);
-//   }
+    return this.appointmentRepository.save(newAppointment);
+  }
 }

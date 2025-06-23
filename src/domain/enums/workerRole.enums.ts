@@ -1,5 +1,5 @@
 export enum WorkerRole {
-  ENFERMEIRA = 'Enfermeira',
+  CUIDADOR = 'Cuidador',
   MASSAGISTA = 'Massagista',
   FISIOTERAPEUTA = 'Fisioterapeuta',
   PSICOLOGO = 'Psicólogo',

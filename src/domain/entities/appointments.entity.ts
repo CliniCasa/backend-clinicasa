@@ -1,4 +1,4 @@
-// import { User } from 'src/users/entities/user.entity'; 
+import { ServiceType } from '../enums/service-type.enum';
 import { User } from './user.entity';
 import { Worker } from './worker.entity';
 
@@ -11,9 +11,9 @@ import {
 } from 'typeorm';
 
 export enum AppointmentStatus {
-  SCHEDULED = 'SCHEDULED', 
-  COMPLETED = 'COMPLETED', 
-  CANCELLED = 'CANCELLED', 
+  SCHEDULED = 'SCHEDULED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
 }
 
 @Entity('appointments')
@@ -30,6 +30,13 @@ export class Appointments {
     default: AppointmentStatus.SCHEDULED,
   })
   status: AppointmentStatus;
+
+  @Column({
+    type: 'enum',
+    enum: ServiceType,
+    nullable: false, 
+  })
+  service: ServiceType;
 
   @ManyToOne(() => Worker, (worker) => worker.appointments)
   worker: Worker;
