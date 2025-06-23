@@ -13,24 +13,24 @@ export class UserService {
   ) {}
 
   create(dto: CreateUserDto) {
-    dto.accountType = 'patient';//fixed user role "Patient" for this initial version of the application
-    const user = this.userRepo.create(dto); //address is already included via DTO
-    return this.userRepo.save(user); //saves user + address (via cascade)
+    dto.accountType = 'patient'; // fixed user role "Patient" for this initial version of the application
+    const user = this.userRepo.create(dto); // address is already included via DTO
+    return this.userRepo.save(user); // saves user + address (via cascade)
   }
 
   findAll() {
     return this.userRepo.find();
   }
 
-  findOne(id: number) {
-    return this.userRepo.findOneBy({ id });
+  findOne(id: string) {
+    return this.userRepo.findOne({ where: { id } });
   }
 
-  update(id: number, dto: UpdateUserDto) {
+  update(id: string, dto: UpdateUserDto) {
     return this.userRepo.update(id, dto);
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return this.userRepo.delete(id);
   }
 }

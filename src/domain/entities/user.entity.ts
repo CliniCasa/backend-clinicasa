@@ -1,11 +1,19 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Address } from './address.entity';
 import { Appointments } from './appointments.entity';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  // UUID como identificador único
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
@@ -25,10 +33,10 @@ export class User {
   @Column({ default: 'patient' })
   accountType: string;
 
-  @OneToOne(()=> Address, {cascade: true, eager: true })
+  @OneToOne(() => Address, { cascade: true, eager: true })
   @JoinColumn()
   address: Address;
-  
+
   @OneToMany(() => Appointments, (appointment) => appointment.user)
-  appointments: Appointments[]; 
+  appointments: Appointments[];
 }
