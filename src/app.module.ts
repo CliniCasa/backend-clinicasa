@@ -7,6 +7,7 @@ import { WorkerModule } from './worker.module';
 import { AddressModule } from './address.module';
 import { UserModule } from './user.module';
 import { AppointmentsModule } from './appointments.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { AppointmentsModule } from './appointments.module';
     AddressModule,
     UserModule,
     AppointmentsModule, 
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
