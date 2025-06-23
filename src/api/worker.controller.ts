@@ -16,8 +16,8 @@ import { CreateWorkerDto } from '../application/dto/worker/create-worker.dto';
 import { UpdateWorkerDto } from '../application/dto/worker/update-worker.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger'; // Importe os decoradores
 import { Worker } from '../domain/entities/worker.entity';
-import { PaginationDto } from 'src/application/dto/pagination/pagination.dto';
-import { PaginationResultDto } from 'src/application/dto/pagination/paginationResult.dto';
+import { PaginationDto } from '../application/dto/pagination/pagination.dto';
+import { PaginationResultDto } from '../application/dto/pagination/paginationResult.dto';
 
 @ApiTags('Workers') 
 @Controller('workers')

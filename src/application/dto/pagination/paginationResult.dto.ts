@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Worker } from 'src/domain/entities/worker.entity';
+import { Worker } from '../../../domain/entities/worker.entity';
 
 export class PaginationResultDto {
   @ApiProperty({ type: [Worker] })
