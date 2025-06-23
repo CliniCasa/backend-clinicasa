@@ -46,7 +46,7 @@ export class AppointmentsService {
 
   // --- MÉTODO CREATE ATUALIZADO ---
   async create(createAppointmentDto: CreateAppointmentDto): Promise<Appointments> {
-    const { workerId, userId, date } = createAppointmentDto;
+    const { workerId, userId, date, service } = createAppointmentDto;
 
     // 4. Buscar as entidades completas de Worker e User
     // Worker usa UUID (string)
@@ -79,7 +79,8 @@ export class AppointmentsService {
     const newAppointment = this.appointmentRepository.create({
       date: appointmentDate,
       worker,  
-      user,    
+      user,
+      service,
     });
 
     return this.appointmentRepository.save(newAppointment);
