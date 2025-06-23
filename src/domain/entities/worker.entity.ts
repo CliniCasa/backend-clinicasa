@@ -1,14 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'; 
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Appointments } from './appointments.entity';
-
-export enum WorkerRole {
-  ENFERMEIRA = 'Enfermeira',
-  MASSAGISTA = 'Massagista',
-  FISIOTERAPEUTA = 'Fisioterapeuta',
-  PSICOLOGO = 'Psicólogo',
-  OUTROS = 'Outros',
-}
+import { WorkerRole } from '../enums/workerRole.enums'; 
 
 @Entity({ name: 'workers' })
 export class Worker {
