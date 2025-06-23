@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { WorkerModule } from './worker.module';
+import { AddressModule } from './address.module';
+import { UserModule } from './user.module';
 import { AppointmentsModule } from './appointments.module';
 import { UserModule } from './user.module';
 
@@ -27,8 +29,7 @@ import { UserModule } from './user.module';
       }),
     }),
     WorkerModule,
-    AppointmentsModule,
-    UserModule,
+    AppointmentsModule, 
   ],
   controllers: [AppController],
   providers: [AppService],
