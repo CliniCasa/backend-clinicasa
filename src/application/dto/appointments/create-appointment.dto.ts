@@ -1,4 +1,4 @@
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
+import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsUUID, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ServiceType } from '../../../domain/enums/service-type.enum';
 
@@ -21,7 +21,7 @@ export class CreateAppointmentDto {
   service: ServiceType;
 
   @ApiProperty({
-    description: 'ID do funcionário que realizará o atendimento',
+    description: 'ID do funcionário que realizará o atendimento (UUID)',
     example: 'a0b1c2d3-e4f5-g6h7-i8j9-k0l1m2n3o4p5',
   })
   @IsUUID()
@@ -32,7 +32,7 @@ export class CreateAppointmentDto {
     description: 'ID numérico do usuário que está agendando', 
     example: 42, 
   })
-  @IsUUID()
+  @IsNumber()
   @IsNotEmpty()
-  userId: string;
+  userId: number;
 }
