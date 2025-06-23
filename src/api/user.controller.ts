@@ -9,7 +9,6 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from 'src/application/services/user.service';
 import { CreateUserDto } from 'src/application/dto/user/create-user.dto';
