@@ -5,6 +5,7 @@ import { Worker } from '../../domain/entities/worker.entity';
 import { CreateWorkerDto } from '../dto/worker/create-worker.dto';
 import { UpdateWorkerDto } from '../dto/worker/update-worker.dto';
 import { PaginationDto } from '../dto/pagination/pagination.dto';
+import { WorkerRole } from 'src/domain/enums/workerRole.enums';
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -54,6 +55,16 @@ export class WorkerService {
     };
   }
 
+    async findByRole(role: WorkerRole): Promise<Worker[]> {
+    const workers = await this.workerRepository.find({
+      where: { role },
+    });
+    if (!workers || workers.length === 0) {
+      throw new NotFoundException(`Nenhum worker encontrado com o cargo: ${role}`);
+    }
+    return workers;
+  }
+  
   async update(id: string, updateWorkerDto: UpdateWorkerDto): Promise<Worker> {
     const worker = await this.workerRepository.preload({
       id,

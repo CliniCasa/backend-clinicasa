@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   HttpCode,
   HttpStatus,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from 'src/application/services/user.service';
 import { CreateUserDto } from 'src/application/dto/user/create-user.dto';
@@ -41,7 +42,7 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'ID do usuário (formato UUID)' })
   @ApiResponse({ status: 200, description: 'Usuário encontrado.', type: User })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number)  {
     return this.service.findOne(id);
   }
 
@@ -50,7 +51,7 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'ID do usuário (formato UUID)' })
   @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso.', type: User })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateUserDto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
     return this.service.update(id, dto);
   }
 
@@ -60,7 +61,7 @@ export class UserController {
   @ApiResponse({ status: 204, description: 'Usuário removido com sucesso.' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.service.remove(id);
   }
 }

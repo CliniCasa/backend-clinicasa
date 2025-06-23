@@ -1,188 +1,61 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Worker } from 'src/domain/entities/worker.entity';
+import { WorkerRole } from 'src/domain/enums/workerRole.enums';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { addDays, setHours, setMinutes, setSeconds, setMilliseconds } from 'date-fns';
+import { WorkerService } from './application/services/worker.service';
 
-// Importe todas as suas entidades
-import { Worker } from './domain/entities/worker.entity';
-import { User } from './domain/entities/user.entity';
-import { Address } from './domain/entities/address.entity';
-import { Appointments } from './domain/entities/appointments.entity';
+@Injectable()
+export class SeedService implements OnModuleInit {
+  // O Logger nos ajuda a ver mensagens no console
+  private readonly logger = new Logger(SeedService.name);
 
-import { WorkerRole } from './domain/enums/workerRole.enums';
-import { ServiceType } from './domain/enums/service-type.enum';
+  constructor(
+    private readonly workerService: WorkerService,
+    @InjectRepository(Worker)
+    private readonly workerRepository: Repository<Worker>,
+  ) {}
 
-// --- DADOS DE WORKER ATUALIZADOS ---
-const workersToSeed: Partial<Worker>[] = [
-  {
-    name: 'Dr. Carlos Silva',
-    email: 'carlos.silva@clinica.com',
-    role: WorkerRole.FISIOTERAPEUTA,
-  },
-  {
-    name: 'Ana Paula',
-    email: 'ana.paula@clinica.com',
-    role: WorkerRole.CUIDADOR,
-  },
-  {
-    name: 'Dr. João Pereira',
-    email: 'joao.pereira@clinica.com',
-    role: WorkerRole.FISIOTERAPEUTA,
-  },
-  {
-    name: 'Maria Souza',
-    email: 'maria.souza@clinica.com',
-    role: WorkerRole.MASSAGISTA,
-  },
-  {
-    name: 'Dra. Fernanda Costa',
-    email: 'fernanda.costa@clinica.com',
-    role: WorkerRole.PSICOLOGO,
-  },
-  // --- MUDANÇA FINAL ABAIXO ---
-  {
-    name: 'Pedro Almeida',
-    email: 'pedro.almeida@clinica.com',
-    role: WorkerRole.OUTROS,
-  },
-];
-
-const usersToSeed = [
-    {
-        name: 'João Paciente',
-        gender: 'Masculino',
-        phone: '11987654321',
-        email: 'joao.paciente@email.com',
-        password: 'Password123!',
-        address: {
-            street: 'Rua das Flores', number: '123', neighborhood: 'Centro',
-            city: 'São Paulo', state: 'SP', zipcode: '01001-000'
-        },
-    },
-    {
-        name: 'Ana Paciente',
-        gender: 'Feminino',
-        phone: '21912345678',
-        email: 'ana.paciente@email.com',
-        password: 'Password123!',
-        address: {
-            street: 'Avenida Principal', number: '456', neighborhood: 'Jardins',
-            city: 'São Paulo', state: 'SP', zipcode: '01414-000'
-        },
-    },
-];
-
-// Função de correção para dados antigos (ainda útil por segurança)
-async function corrigirWorkersComDadosNulos(repo: Repository<Worker>) {
-  console.log('Verificando e corrigindo Workers com dados nulos...');
-  await repo.query("UPDATE workers SET services = '{}' WHERE services IS NULL");
-  console.log('Correção de Workers concluída.');
-}
-
-
-async function seedWorkers(repo: Repository<Worker>) {
-  console.log('Iniciando seed de Workers...');
-  for (const data of workersToSeed) {
-    const existing = await repo.findOne({ where: { email: data.email } });
-    if (!existing) {
-      await repo.save(repo.create(data));
-      console.log(`Worker '${data.name}' inserido.`);
-    } else {
-      await repo.update({ id: existing.id }, data);
-      console.log(`Worker '${data.name}' já existe. Dados atualizados.`);
-    }
+  // Este método é executado automaticamente quando o módulo é iniciado
+  async onModuleInit() {
+    this.logger.log('Iniciando verificação do seed de dados...');
+    await this.seedWorkers();
   }
-}
 
-async function seedUsersAndAddresses(repo: Repository<User>) {
-    console.log('Iniciando seed de Users e Addresses...');
-    for (const data of usersToSeed) {
-      const existing = await repo.findOne({ where: { email: data.email } });
-      if (!existing) {
-        const hashedPassword = await bcrypt.hash(data.password, 10);
-        const userToSave = { ...data, password: hashedPassword };
-        await repo.save(repo.create(userToSave));
-        console.log(`User '${data.name}' inserido.`);
-      } else {
-        console.log(`User '${data.name}' já existe.`);
-      }
-    }
-  }
-  
-  async function seedAppointments(
-    appointmentRepo: Repository<Appointments>,
-    userRepo: Repository<User>,
-    workerRepo: Repository<Worker>,
-  ) {
-    console.log('Iniciando seed de Appointments...');
-    await appointmentRepo.clear();
-  
-    const users = await userRepo.find();
-    const workers = await workerRepo.find({ order: { name: 'ASC' } });
-  
-    if (users.length < 2 || workers.length < 2) {
-      console.log('Não há usuários ou workers suficientes para criar agendamentos. Pulando.');
+  private async seedWorkers() {
+    // 1. Primeiro, verificamos se já existem workers no banco
+    const count = await this.workerRepository.count();
+    if (count > 0) {
+      this.logger.log('O banco de dados de Workers já possui dados. Seed não será executado.');
       return;
     }
-    
-    let todayAt10 = setHours(setMinutes(setSeconds(setMilliseconds(new Date(), 0), 0), 0), 10);
-    let tomorrowAt14 = setHours(setMinutes(setSeconds(setMilliseconds(addDays(new Date(), 1), 0), 0), 0), 14);
-  
-    const appointmentsToSeed = [
-      {
-        user: users[0],
-        worker: workers.find(w => w.email === 'carlos.silva@clinica.com')!,
-        date: todayAt10,
-        service: ServiceType.PILATES_CLINICO,
-      },
-      {
-        user: users[1],
-        worker: workers.find(w => w.email === 'ana.paula@clinica.com')!,
-        date: tomorrowAt14,
-        service: ServiceType.CURATIVO, 
-      },
-      {
-        user: users[1],
-        worker: workers.find(w => w.email === 'carlos.silva@clinica.com')!,
-        date: todayAt10,
-        service: ServiceType.FISIOTERAPIA_MOTORA,
-      },
+
+    this.logger.log('Populando o banco de dados com Workers...');
+
+    // 2. Lista de 10 workers para criar
+    const workersToCreate = [
+      { name: 'Ana Carolina Souza', email: 'ana.souza@clinicasa.com', role: WorkerRole.CUIDADOR, description: 'Cuidadora com 5 anos de experiência em geriatria.' },
+      { name: 'Bruno Marques', email: 'bruno.marques@clinicasa.com', role: WorkerRole.FISIOTERAPEUTA, description: 'Fisioterapeuta ortopédico especializado em reabilitação pós-cirúrgica.' },
+      { name: 'Carla Dias', email: 'carla.dias@clinicasa.com', role: WorkerRole.MASSAGISTA, description: 'Massoterapeuta com foco em shiatsu e massagem relaxante.' },
+      { name: 'Daniel Alves', email: 'daniel.alves@clinicasa.com', role: WorkerRole.MEDICO, description: 'Clínico geral com atendimento focado em visitas domiciliares.' },
+      { name: 'Eduarda Ferreira', email: 'eduarda.ferreira@clinicasa.com', role: WorkerRole.PSICOLOGO, description: 'Psicóloga com abordagem em terapia cognitivo-comportamental.' },
+      { name: 'Fernando Lima', email: 'fernando.lima@clinicasa.com', role: WorkerRole.CUIDADOR, description: 'Acompanhante hospitalar e cuidador de idosos.' },
+      { name: 'Gabriela Costa', email: 'gabriela.costa@clinicasa.com', role: WorkerRole.FISIOTERAPEUTA, description: 'Especialista em fisioterapia respiratória para pacientes acamados.' },
+      { name:
+      'Heitor Pereira', email: 'heitor.pereira@clinicasa.com', role: WorkerRole.OUTROS, description: 'Motorista para transporte de pacientes com mobilidade reduzida.' },
+      { name: 'Juliana Martins', email: 'juliana.martins@clinicasa.com', role: WorkerRole.CUIDADOR, description: 'Técnica de enfermagem atuando como cuidadora.' },
+      { name: 'Lucas Gonçalves', email: 'lucas.goncalves@clinicasa.com', role: WorkerRole.MEDICO, description: 'Médico recém-formado para consultas de rotina e emissão de atestados.' },
     ];
-  
-    for (const data of appointmentsToSeed) {
-      if (!data.worker) {
-          console.warn(`Worker não encontrado para o agendamento, pulando.`);
-          continue;
-      }
-      const newAppointment = appointmentRepo.create(data);
-      await appointmentRepo.save(newAppointment);
-      console.log(`Agendamento criado para ${data.user.name} com ${data.worker.name} em ${data.date.toLocaleString()}`);
-    }
+
+    // 3. Criamos uma "promessa" para cada worker
+    // Usamos o WorkerService para garantir que validações e lógicas (como hash de senha, se houver) sejam aplicadas.
+    const creationPromises = workersToCreate.map(workerData =>
+      this.workerService.create(workerData)
+    );
+
+    // 4. Executamos todas as promessas em paralelo
+    await Promise.all(creationPromises);
+
+    this.logger.log('Seed de Workers concluído com sucesso!');
   }
-  
-  async function bootstrap() {
-    const app = await NestFactory.createApplicationContext(AppModule);
-  
-    const workerRepository = app.get<Repository<Worker>>(getRepositoryToken(Worker));
-    const userRepository = app.get<Repository<User>>(getRepositoryToken(User));
-    const appointmentRepository = app.get<Repository<Appointments>>(getRepositoryToken(Appointments));
-  
-    try {
-      console.log('--- INICIANDO SEED ---');
-      await corrigirWorkersComDadosNulos(workerRepository);
-      
-      await seedWorkers(workerRepository);      
-      await seedUsersAndAddresses(userRepository);
-      await seedAppointments(appointmentRepository, userRepository, workerRepository);
-      
-      console.log('✅ Seed concluída com sucesso!');
-    } catch (error) {
-      console.error('❌ Erro durante a execução da seed:', error);
-    } finally {
-      await app.close();
-    }
-  }
-  
-  bootstrap();
+}
