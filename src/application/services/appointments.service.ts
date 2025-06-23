@@ -60,13 +60,7 @@ export class AppointmentsService {
     if (!user) {
       throw new NotFoundException(`User com ID "${userId}" não encontrado.`);
     }
-    
-    // 5. VALIDAÇÃO PRINCIPAL: Verificar se o serviço está na lista de serviços do funcionário
-    if (!worker.services.includes(service)) {
-      throw new BadRequestException(
-        `O serviço "${service}" selecionado não é realizado por este funcionário.`,
-      );
-    }
+
     
     // 6. Manter sua validação original de conflito de horário
     const appointmentDate = new Date(date);

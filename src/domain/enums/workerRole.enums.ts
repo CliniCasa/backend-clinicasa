@@ -1,8 +1,8 @@
 export enum WorkerRole {
-  CUIDADOR = 'Cuidador',
-  MASSAGISTA = 'Massagista',
-  FISIOTERAPEUTA = 'Fisioterapeuta',
-  PSICOLOGO = 'Psicólogo',
-  MEDICO = 'Médico',
-  OUTROS = 'Outros',
+  CUIDADOR = 'CUIDADOR',
+  MASSAGISTA = 'MASSAGISTA',
+  FISIOTERAPEUTA = 'FISIOTERAPEUTA',
+  PSICOLOGO = 'PSICOLOGO',
+  MEDICO = 'MEDICO',
+  OUTROS = 'OUTROS',
 }

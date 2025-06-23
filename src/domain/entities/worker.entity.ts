@@ -40,33 +40,6 @@ export class Worker {
   })
   role: WorkerRole;
 
-  // 2. Adicionar a nova coluna de serviços
-  @ApiProperty({
-    description: 'A lista de serviços que o funcionário está habilitado a realizar',
-    enum: ServiceType,
-    isArray: true,
-    example: [ServiceType.APLICACAO_INJECAO, ServiceType.CURATIVO],
-  })
-  @Column({
-    type: 'enum',
-    enum: ServiceType,
-    array: true, // Isso define a coluna como um array
-    nullable: false,
-    default: [], // Define um array vazio como padrão
-  })
-  services: ServiceType[];
-
-  @ApiProperty({
-    description: 'Uma breve descrição ou biografia do funcionário',
-    example: 'Enfermeira chefe com 10 anos de experiência em cuidados intensivos.',
-    required: false, // Indica que o campo é opcional na documentação da API
-  })
-  @Column({
-    type: 'text', // 'text' é ideal para textos longos
-    nullable: true, // A descrição é opcional
-  })
-  description: string;
-
   @OneToMany(() => Appointments, (appointments) => appointments.worker)
   appointments: Appointments[]; 
 }

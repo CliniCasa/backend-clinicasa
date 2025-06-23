@@ -20,44 +20,32 @@ const workersToSeed: Partial<Worker>[] = [
     name: 'Dr. Carlos Silva',
     email: 'carlos.silva@clinica.com',
     role: WorkerRole.FISIOTERAPEUTA,
-    description: 'Fisioterapeuta com 5 anos de experiência em reabilitação motora.',
-    services: [ServiceType.FISIOTERAPIA_MOTORA, ServiceType.PILATES_CLINICO],
   },
   {
     name: 'Ana Paula',
     email: 'ana.paula@clinica.com',
     role: WorkerRole.CUIDADOR,
-    description: 'Cuidadora dedicada a cuidados domiciliares e aplicação de medicamentos.',
-    services: [ServiceType.APLICACAO_INJECAO, ServiceType.CURATIVO, ServiceType.AFERICAO_PRESSAO],
   },
   {
     name: 'Dr. João Pereira',
     email: 'joao.pereira@clinica.com',
     role: WorkerRole.FISIOTERAPEUTA,
-    description: 'Especialista em fisioterapia respiratória para todas as idades.',
-    services: [ServiceType.FISIOTERAPIA_RESPIRATORIA],
   },
   {
     name: 'Maria Souza',
     email: 'maria.souza@clinica.com',
     role: WorkerRole.MASSAGISTA,
-    description: 'Massagista certificada em técnicas de relaxamento e drenagem.',
-    services: [ServiceType.MASSAGEM_RELAXANTE, ServiceType.DRENAGEM_LINFATICA],
   },
   {
     name: 'Dra. Fernanda Costa',
     email: 'fernanda.costa@clinica.com',
     role: WorkerRole.PSICOLOGO,
-    description: 'Psicóloga com foco em terapia cognitivo-comportamental.',
-    services: [ServiceType.SESSAO_TERAPIA_INDIVIDUAL],
   },
   // --- MUDANÇA FINAL ABAIXO ---
   {
     name: 'Pedro Almeida',
     email: 'pedro.almeida@clinica.com',
     role: WorkerRole.OUTROS,
-    description: 'Profissional para atividades de transporte e suporte.',
-    services: [ServiceType.TRANSPORTE_PACIENTE, ServiceType.ACOMPANHAMENTO_CONSULTA], // <-- SERVIÇOS ATRIBUÍDOS
   },
 ];
 

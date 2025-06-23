@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { Worker } from '../../domain/entities/worker.entity';
@@ -21,17 +21,17 @@ export class WorkerService {
   ) {}
 
   async create(createWorkerDto: CreateWorkerDto): Promise<Worker> {
+    const { email } = createWorkerDto;
+    const existingWorker = await this.workerRepository.findOneBy({ email });
+
+    if (existingWorker) {
+      throw new ConflictException(`Já existe um funcionário cadastrado com o e-mail: ${email}`);
+    }
+
     const worker = this.workerRepository.create(createWorkerDto);
     return this.workerRepository.save(worker);
   }
 
-  async findOne(id: string): Promise<Worker> {
-    const worker = await this.workerRepository.findOneBy({ id });
-    if (!worker) {
-      throw new NotFoundException(`Worker with ID "${id}" not found`);
-    }
-    return worker;
-  }
 
   async findAll(query: PaginationDto): Promise<PaginatedResult<Worker>> {
     const { page = 1, limit = 10, search } = query;
@@ -63,6 +63,14 @@ export class WorkerService {
       throw new NotFoundException(`Worker with ID "${id}" not found`);
     }
     return this.workerRepository.save(worker);
+  }
+
+  async findOne(id: string): Promise<Worker> {
+    const worker = await this.workerRepository.findOneBy({ id });
+    if (!worker) {
+      throw new NotFoundException(`Worker with ID "${id}" not found`);
+    }
+    return worker;
   }
 
   async remove(id: string): Promise<void> {
