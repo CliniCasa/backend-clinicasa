@@ -8,6 +8,7 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 
 export enum AppointmentStatus {
@@ -39,10 +40,18 @@ export class Appointments {
   service: ServiceType;
 
   @ManyToOne(() => Worker, (worker) => worker.appointments)
+  @JoinColumn({ name: 'workerId' })
   worker: Worker;
 
+  @Column({ type: 'uuid', nullable: true })
+  workerId: string;
+
   @ManyToOne(() => User, (user) => user.appointments)
+  @JoinColumn({ name: 'userId' })
   user: User;
+
+  @Column({ type: 'integer', nullable: true })
+  userId: number;
 
   @CreateDateColumn()
   createdAt: Date;

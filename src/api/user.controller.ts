@@ -6,10 +6,9 @@ import {
   Param,
   Post,
   Put,
-  ParseUUIDPipe,
+  ParseIntPipe,
   HttpCode,
   HttpStatus,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from 'src/application/services/user.service';
 import { CreateUserDto } from 'src/application/dto/user/create-user.dto';
@@ -39,7 +38,7 @@ export class UserController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar um usuário pelo ID' })
-  @ApiParam({ name: 'id', description: 'ID do usuário (formato UUID)' })
+  @ApiParam({ name: 'id', description: 'ID do usuário (inteiro)' })
   @ApiResponse({ status: 200, description: 'Usuário encontrado.', type: User })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   findOne(@Param('id', ParseIntPipe) id: number)  {
@@ -48,7 +47,7 @@ export class UserController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar um usuário pelo ID' })
-  @ApiParam({ name: 'id', description: 'ID do usuário (formato UUID)' })
+  @ApiParam({ name: 'id', description: 'ID do usuário (inteiro)' })
   @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso.', type: User })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
@@ -57,7 +56,7 @@ export class UserController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remover um usuário pelo ID' })
-  @ApiParam({ name: 'id', description: 'ID do usuário (formato UUID)' })
+  @ApiParam({ name: 'id', description: 'ID do usuário (inteiro)' })
   @ApiResponse({ status: 204, description: 'Usuário removido com sucesso.' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   @HttpCode(HttpStatus.NO_CONTENT)

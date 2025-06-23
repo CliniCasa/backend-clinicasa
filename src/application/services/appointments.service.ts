@@ -46,14 +46,16 @@ export class AppointmentsService {
 
   // --- MÉTODO CREATE ATUALIZADO ---
   async create(createAppointmentDto: CreateAppointmentDto): Promise<Appointments> {
-    const { workerId, userId, date } = createAppointmentDto;
+    const { workerId, userId, date, service } = createAppointmentDto;
 
     // 4. Buscar as entidades completas de Worker e User
+    // Worker usa UUID (string)
     const worker = await this.workerRepository.findOneBy({ id: workerId });
     if (!worker) {
       throw new NotFoundException(`Worker com ID "${workerId}" não encontrado.`);
     }
 
+    // User usa ID serial (number)
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new NotFoundException(`User com ID "${userId}" não encontrado.`);
@@ -64,7 +66,7 @@ export class AppointmentsService {
     const appointmentDate = new Date(date);
     const existingAppointment = await this.appointmentRepository.findOne({
       where: {
-        worker: { id: workerId },
+        worker: { id: workerId }, // Worker ID é string (UUID)
         date: appointmentDate,
       },
     });
@@ -77,7 +79,8 @@ export class AppointmentsService {
     const newAppointment = this.appointmentRepository.create({
       date: appointmentDate,
       worker,  
-      user,    
+      user,
+      service,
     });
 
     return this.appointmentRepository.save(newAppointment);

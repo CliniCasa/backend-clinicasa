@@ -1,5 +1,6 @@
 import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsNumberString, IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ServiceType } from '../../../domain/enums/service-type.enum';
 
 export class CreateAppointmentDto {
   @ApiProperty({
@@ -25,4 +26,13 @@ export class CreateAppointmentDto {
   @IsNumber()
   @IsNotEmpty()
   userId: number;
+
+  @ApiProperty({
+    description: 'Tipo de serviço a ser realizado',
+    enum: ServiceType,
+    example: ServiceType.FISIOTERAPIA_MOTORA,
+  })
+  @IsEnum(ServiceType)
+  @IsNotEmpty()
+  service: ServiceType;
 }
