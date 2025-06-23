@@ -6,7 +6,7 @@ import {
   Param,
   Post,
   Put,
-  ParseUUIDPipe,
+  ParseIntPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -38,29 +38,29 @@ export class UserController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar um usuário pelo ID' })
-  @ApiParam({ name: 'id', description: 'ID do usuário (formato UUID)' })
+  @ApiParam({ name: 'id', description: 'ID do usuário (inteiro)' })
   @ApiResponse({ status: 200, description: 'Usuário encontrado.', type: User })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar um usuário pelo ID' })
-  @ApiParam({ name: 'id', description: 'ID do usuário (formato UUID)' })
+  @ApiParam({ name: 'id', description: 'ID do usuário (inteiro)' })
   @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso.', type: User })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateUserDto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
     return this.service.update(id, dto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remover um usuário pelo ID' })
-  @ApiParam({ name: 'id', description: 'ID do usuário (formato UUID)' })
+  @ApiParam({ name: 'id', description: 'ID do usuário (inteiro)' })
   @ApiResponse({ status: 204, description: 'Usuário removido com sucesso.' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.service.remove(id);
   }
 }

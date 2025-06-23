@@ -11,9 +11,9 @@ import { Appointments } from './appointments.entity';
 
 @Entity('users')
 export class User {
-  // UUID como identificador único
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  // ID serial como identificador único (consistente com as migrações)
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   name: string;

@@ -22,15 +22,15 @@ export class UserService {
     return this.userRepo.find();
   }
 
-  findOne(id: string) {
+  findOne(id: number) {
     return this.userRepo.findOne({ where: { id } });
   }
 
-  update(id: string, dto: UpdateUserDto) {
+  update(id: number, dto: UpdateUserDto) {
     return this.userRepo.update(id, dto);
   }
 
-  remove(id: string) {
+  remove(id: number) {
     return this.userRepo.delete(id);
   }
 }
