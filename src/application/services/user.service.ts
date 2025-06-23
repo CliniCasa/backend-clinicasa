@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from '../../domain/entities/user.entity';
 import { CreateUserDto } from '../dto/user/create-user.dto';
 import { UpdateUserDto } from '../dto/user/update-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -12,10 +13,17 @@ export class UserService {
     private readonly userRepo: Repository<User>,
   ) {}
 
-  create(dto: CreateUserDto) {
+  async create(dto: CreateUserDto) {
     dto.accountType = 'patient'; // fixed user role "Patient" for this initial version of the application
-    const user = this.userRepo.create(dto); // address is already included via DTO
-    return this.userRepo.save(user); // saves user + address (via cascade)
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    const user = this.userRepo.create({
+      ...dto,
+      password: hashedPassword, // switches for the hashed password
+    });
+
+    return this.userRepo.save(user); // saves the user with address (via cascade)
   }
 
   findAll() {
@@ -26,11 +34,16 @@ export class UserService {
     return this.userRepo.findOne({ where: { id } });
   }
 
-  update(id: string, dto: UpdateUserDto) {
-    return this.userRepo.update(id, dto);
+  async update(id: string, dto: UpdateUserDto) {
+    if (dto.password) {
+      dto.password = await bcrypt.hash(dto.password, 10);
+    }
+    await this.userRepo.update(id, dto);
+    return this.findOne(id);
   }
 
-  remove(id: string) {
-    return this.userRepo.delete(id);
+  async remove(id: string) {
+    await this.userRepo.delete(id);
+    return { deleted: true };
   }
 }
