@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Address } from './address.entity';
+import { Appointments } from './appointments.entity';
 
 @Entity('users')
 export class User {
@@ -24,8 +25,10 @@ export class User {
   @Column({ default: 'patient' })
   accountType: string;
 
-  //1:1 relationship with address
   @OneToOne(()=> Address, {cascade: true, eager: true })
   @JoinColumn()
   address: Address;
+  
+  @OneToMany(() => Appointments, (appointment) => appointment.user)
+  appointments: Appointments[]; 
 }

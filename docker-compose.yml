@@ -1,19 +1,22 @@
-# docker-compose.yml
+version: '3.8'
 
-version: '3.8' 
 services:
-  postgres_db:
-    image: postgres:15 
-    container_name: clinicasa-postgres
+  # Serviço de banco de dados para o projeto clinicasa
+  database:
+    image: postgres:15
+    container_name: clinicasa-postgres-container
     restart: always
     environment:
-      POSTGRES_USER: clinicasa 
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: clinicasa-postgres 
+      # Lendo as credenciais do arquivo .env
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5433:5432" 
+      # Lendo a porta do arquivo .env
+      - "${DB_PORT}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data 
+      - clinicasa-db-volume:/var/lib/postgresql/data
 
 volumes:
-  postgres_data: 
+  # Definindo o volume que guardará os dados do banco
+  clinicasa-db-volume:

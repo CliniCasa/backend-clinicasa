@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger'; // 1. Importação do Swagger
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger'; 
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Appointments } from './appointments.entity';
 
 export enum WorkerRole {
   ENFERMEIRA = 'Enfermeira',
@@ -44,4 +45,7 @@ export class Worker {
     default: WorkerRole.ENFERMEIRA,
   })
   role: WorkerRole;
+
+  @OneToMany(() => Appointments, (appointments) => appointments.worker)
+  appointments: Appointments[]; 
 }
